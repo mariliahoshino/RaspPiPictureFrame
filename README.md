@@ -1,8 +1,8 @@
 Fotos vídeo do projeto
 https://www.instagram.com/p/B849sLOpGmW/?utm_source=ig_web_copy_link
 
-Realizar a instalação da biblioteca com as configurações de resolução já definidas pelos comando abaixo, estou usando um display 5"
-sudo rm -rf LCD-show
+Realizar a instalação da biblioteca com as configurações de resolução já definidas pelos comando abaixo, estou usando um display 5" \n
+sudo rm -rf LCD-show \n
 git clone https://github.com/goodtft/LCD-show.git
 chmod -R 755 LCD-show
 cd LCD-show/
