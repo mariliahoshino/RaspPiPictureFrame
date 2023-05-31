@@ -1,101 +1,99 @@
-Fotos vídeo do projeto
+Project photos and video
 https://www.instagram.com/p/B849sLOpGmW/?utm_source=ig_web_copy_link
 
-Realizar a instalação da biblioteca com as configurações de resolução já definidas pelos comando abaixo, estou usando um display 5" 
+Install the library with the resolution settings already defined by the commands below, I'm using a 5" display
 
-sudo rm -rf LCD-show 
+<code>sudo rm -rf LCD-show  </code> <br>
+<code>git clone https://github.com/goodtft/LCD-show.git </code><br>
+<code>chmod -R 755 LCD-show </code><br>
+<code>cd LCD-show/ </code><br>
+<code>sudo ./LCD5-show </code><br>
 
-git clone https://github.com/goodtft/LCD-show.git
+If the screen is not in the expected position, it is possible to rotate it with these commands below
+in place of 90 you can put the following values 0, 90, 180, 270
+<code> cd LCD-show/ </code><br>
+<code> sudo ./rotate.sh 90 </code><br>
 
-chmod -R 755 LCD-show
+For the calibration of the touch screen, the commands below are required
 
-cd LCD-show/
+<code>sudo rm -rf LCD-show </code><br>
+<code>git clone https://github.com/goodtft/LCD-show.git </code><br>
+<code>chmod -R 755 LCD-show </code><br>
+<code>cd LCD-show/ </code><br>
+<code>sudo dpkg -i -B xinput-calibrator_0.7.5-1_armhf.deb </code><br>
 
-sudo ./LCD5-show
+Then the command
+<code> DISPLAY=:0.0 xinput_calibrator </code><br>
+Touch points will appear on the screen for calibration
 
+Then run the command
+<code> sudo nano /etc/X11/xorg.conf.d/99-calibration.conf </code><br>
 
-Caso a tela não fique na posição esperada é possível rotacionar com esses comandos abaixo
+CTRL + X to exit
+Y to save
+and Enter to confirm
 
-no lugar do 90 pode ser colocado os seguintes valores 0, 90, 180, 270
-cd LCD-show/
-sudo ./rotate.sh 90
-Para a calibração do touch screen é necessário os comandos abaixo
+restart with
+<code>sudo reboot </code><br>
 
-sudo rm -rf LCD-show
-git clone https://github.com/goodtft/LCD-show.git
-chmod -R 755 LCD-show
-cd LCD-show/
-sudo dpkg -i -B xinput-calibrator_0.7.5-1_armhf.deb
+audio output
+Then, as the screen has no sound output, it is necessary to enable the Raspberry P2 output
 
-Em seguida o comando
-DISPLAY=:0.0 xinput_calibrator
+1 = analog, 2 = HDMI, 0 = auto detectable
+<code>amixer cset numid=3 X </code><br> X= 0, 1, 2 (in my situation I used "1" analog)
 
-Irá aparecer os pontos de toque na tela para calibração
+Configure no screen blanking
+To disable screen blanking, open the lightdm.conf file.
+<code>sudo nano /etc/lightdm/lightdm.conf</code><br>
 
-Depois executar o comando
-sudo nano /etc/X11/xorg.conf.d/99-calibration.conf
+Now here add the following line anywhere below the <b>[SeatsDefaults]</b> line.
+<code>xserver-command=X -s 0 –dpms</code><br>
 
-CTRL + X para sair
-Y para salvar
-e Enter para confirmar
+CTRL + X to exit
+Y to save
+and Enter to confirm
 
-reiniciar com
-sudo reboot
+Now restart the Pi and the screen should no longer turn off after 10 minutes of inactivity. To restart, perform the following:
+<code>sudo reboot</code><br>
 
-Saída de áudio
-Depois como a tela não tem saída de som é necessário habilitar a saída P2 do Raspberry
+Set to auto run to show photos
+To install the package, use the following line:
+<code>sudo apt-get install feh</code><br>
 
-1 = analógico, 2 = HDMI, 0 = auto detectável
-amixer cset numid=3 X X= 0, 1, 2
-Configurar do desligamento de tela
+Now, to test that it works, type the following line. Replace /home/pi/desktop/Fotos with the directory that contains your image.
 
-Para desativar o apagamento da tela, abra o arquivo lightdm.conf .
-sudo nano /etc/lightdm/lightdm.conf
+<code>DISPLAY=:0.0 XAUTHORITY=/home/pi/.Xauthority /usr/bin/feh --quiet --preload --randomize --full-screen --reload 60 -Y --slideshow-delay 15.0 /home/pi/desktop/Fotos & </code><br>
 
-Agora, aqui, adicione a seguinte linha em qualquer lugar abaixo da linha [SeatsDefaults] .
-xserver-command=X -s 0 –dpms
+Extra 3. Now if you want we can use short tags to make this command much shorter. You can read more about all the flags you can use in the feh manpage, or use the one above normally.
+<code>DISPLAY=:0.0 XAUTHORITY=/home/pi/.Xauthority /usr/bin/feh -q -p -Z -F -R 60 -Y -D 15.0 /home/pi/desktop/Fotos & </code><br>
 
-Salve e saia pressionando ctrl + x e depois y .
+Now, as you'll notice, this crashes the command line bar. To fix this, add the <code>&</code> after the command and the script/process will start in the background.
+So now let's store this in a simple script file. That way you can add or change it later. To make the file, type the following command:
+<code>sudo nano /home/pi/start-picture-frame.sh</code><br>
 
-Agora, reinicie o Pi e a tela não deverá mais se desligar após 10 minutos de inatividade. Para reiniciar, execute o seguinte:
-sudo reboot
+Here, type the following lines.
+<code>#!/bin/bash </code><br>
+<code>DISPLAY=:0.0 XAUTHORITY=/home/pi/.Xauthority /usr/bin/feh --quiet --preload --randomize --full-screen --reload 60 -Y --slideshow-delay 15.0 /home/pi/desktop/Fotos </code> <br>
+I prefer without the <code>--preload</code>, you can test
 
-Configurar para auto execução para mostrar as fotos
+Now ready, you can test it by running the following command.
+<code>bash /home/pi/start-picture-frame.sh </code><br>
 
-Para instalar o pacote, use a seguinte linha:
-sudo apt-get install feh
+Configuring to start together with Raspbian
+Open the file <code>/etc/profile</code>, with command <code> sudo nano /etc/profile</code>
 
-Agora, para testar se ele funciona, digite a seguinte linha. Substitua /home/pi/desktop/Fotos pelo diretório que contém toda a sua imagem.
-
-DISPLAY=:0.0 XAUTHORITY=/home/pi/.Xauthority /usr/bin/feh --quiet --preload --randomize --full-screen --reload 60 -Y --slideshow-delay 15.0 /home/pi/desktop/Fotos &
-
-Extra 3. Agora se quiser podemos usar tags curtas para tornar esse comando muito mais curto. Você pode ler mais sobre todas as bandeiras que você pode usar na página de manual feh, ou usar normalmente a de cima
-DISPLAY=:0.0 XAUTHORITY=/home/pi/.Xauthority /usr/bin/feh -q -p -Z -F -R 60 -Y -D 15.0 /home/pi/desktop/Fotos &
-
-Agora, como você notará, isso trava a barra da linha de comando. Para corrigir isso, adicione o & após o comando e o script / processo será iniciado em segundo plano.
-
-Então agora vamos armazenar isso em um arquivo de script simples. Dessa forma, você pode adicionar ou alterar posteriormente. Para fazer o arquivo, digite o seguinte comando:
-sudo nano /home/pi/start-picture-frame.sh
-
-Aqui, digite as seguintes linhas.
-#!/bin/bash
-DISPLAY=:0.0 XAUTHORITY=/home/pi/.Xauthority /usr/bin/feh --quiet --preload --randomize --full-screen --reload 60 -Y --slideshow-delay 15.0 /home/pi/desktop/Fotos
-Prefiro sem o --preload
-
-Agora pronto, você pode testá-lo executando o seguinte comando.
-bash /home/pi/start-picture-frame.sh
-
-Configurando para iniciar junto com o Raspbian
-Abra o arquivo /etc/profile, com o comando sudo nano /etc/profile.
-
-No final do arquivo insira o comando que irá executar, por exemplo:
-bash /home/pi/start-picture-frame.sh & & é necessário
+At the end of the file, insert the command that will run, for example:
+<code>bash /home/pi/start-picture-frame.sh & </code> & is necessary
 
 Salve e saia
 Reiniciando, deverá executar automaticamente
 Demora um puco até carregar as fotos e iniciar os slides de fotos, pode observar o cache do processador carregando
 
-Fontes
+save and exit
+Rebooting should automatically run
+It takes a while to load the photos and start the photo slides, you can see the processor cache loading, to open almost immediately I prefer without the <code>--preload </code> available in the library
+
+Source
 http://www.lcdwiki.com/5inch_HDMI_Display
 http://www.lcdwiki.com/res/Show_Direction_and_Touch/How_to_calibrate_the_resistance_touch_screen-V1.2.pdf
 https://devblog.drall.com.br/raspberry-pi-raspbian
